@@ -2,7 +2,7 @@
 #### A Shiny WebApp
 
 ### Why have I done this project?
-The project is done to show my elementary proficiency in using R-packages 'Shiny' & 'ShinyDashboard' to build WebApp and tell my story.<br> </br>
+The project is done to show my elementary proficiency in using R-packages 'Shiny' & 'ShinyDashboard' to build WebApp and tell my story.<br></br>
 ### What is this project?
 It's a webapp which gives information and some statistics of previous FIFA worldcups. There are two versions of webapp - one is done just using shiny while other one is dashboard version of same app.<br></br>
 #### Project shows proficiency in  
