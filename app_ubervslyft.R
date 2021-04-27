@@ -69,7 +69,7 @@ server <- function(input, output, session) {
   output$heading <- renderUI({
     HTML("<h5><b>The objective is to do a comparative anaalysis of Uber and Lyft pickups at Phoenix Airport. We start with some mean stats to gain a basic idea.</h3>")
   })
-  #rendering default tab
+  #rendering the default tab
   output$menu <- renderMenu({
     sidebarMenu(
       menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
