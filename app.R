@@ -1,203 +1,200 @@
 library(shiny)
-library(shinythemes)
-library(shinyWidgets)
-fifa_wc <- read.csv('WorldCups.csv')
+library(shinydashboard)
+library(plotly)
+library(ggplot2)
+library(lubridate)
+library(scales)
+library(gridExtra)
 
+pickedup_combine <- read.csv("Data/pickup_combined.csv")
+pubydate <- read.csv("Data/TotalPUbyDate.csv")
+pubyday<- read.csv("Data/TotalPUbyDay.csv")
+pubymonth <- read.csv("Data/TotalPUbyMonth.csv")
+pubymonth_fc <- read.csv("Data/TotalPUbyMonth_fc.csv")
+pubyweek <- read.csv("Data/TotalPUbyWeek.csv")
 
-ui <- fluidPage(theme = shinytheme("readable"),
-  setBackgroundImage(src = "fifa1.jpg"),
-  titlePanel("FIFA viz"),
-  sidebarLayout(
-    sidebarPanel( width = 3,
-      tags$style(".well {background-color: #bfe6e6;}"),
-      helpText(h5("This application gives info and stats about FIFA worldcups")),
-      selectInput("year", label = "Choose a FIFA worldcup year", 
-                  choices = list("1930",
-                                 "1934",
-                                 "1938",
-                                 "1950",
-                                 "1954",
-                                 "1958",
-                                 "1962",
-                                 "1966",
-                                 "1970",
-                                 "1974",
-                                 "1978",
-                                 "1982",
-                                 "1986",
-                                 "1990",
-                                 "1994",
-                                 "1998",
-                                 "2002",
-                                 "2006",
-                                 "2010",
-                                 "2014",
-                                 "2018"), selected = "2010")
-    ),
-    mainPanel(
-      fluidRow(
-      tabsetPanel( type = "tabs",
-                   tabPanel(h5("Information"),
-                            fluidRow(style="height:10px;", column(12, " ")),
-      fluidRow(#style="height:10px;",
-        column(2,div(style = "height: 170px; padding: 0px 0px",imageOutput("preImage"))),
-        column(8,div(style = "height: 170px; padding: 0px 0px",htmlOutput("text"))),
-        column(2,div(style = "height: 170px; padding: 0px 0px",imageOutput("mascotImage")))
-        ),
-      fluidRow(column(12,div(style = "height: 1px; padding: 0px 0px"," "))),
-      fluidRow(
-        column(3,div(style = "height: 150px; padding: 0px 0px",htmlOutput("win"),imageOutput("imagewinner"))),
-        column(3,div(style = "height: 150px; padding: 0px 0px",htmlOutput("rp"),imageOutput("imagerp"))),
-        column(3,div(style = "height: 150px; padding: 0px 0px",htmlOutput("th"),htmlOutput("text1"), align = "center")),
-        column(3,div(style = "height: 150px; padding: 0px 0px",htmlOutput("fo"),htmlOutput("text2"), align = "center"))
-      ),
-      fluidRow(
-        column(12,div(style = "height: 10px; padding: 0px 0px"," "))),
-      fluidRow(
-        column(3,div(style = "height: 45px; padding: 0px 0px",htmlOutput("win1"), align = "center")),
-        column(3,div(style = "height: 45px; padding: 0px 0px",htmlOutput("rp1"), align = "center")),
-        column(3,div(style = "height: 45px; padding: 0px 0px",textOutput("th1"))),
-        column(3,div(style = "height: 45px; padding: 0px 0px",textOutput("fo1")))
-      )
-      
-      ),
-      
-     tabPanel(h5("Some Stats"),
-              fluidRow(column(12,div(style = "height: 01px; padding: 0px 0px"))),
-      
-      fluidRow(column(12,
-                      fluidRow( 
-                               column(12,div(style = "height: 05px; padding: 0px 0px"),fluidRow(column(3,offset = 1, htmlOutput("teamspl")), 
-                                                  column(3,offset =3 ,htmlOutput("matpl"))))))),
-      fluidRow(column(4,div(style = "height: 05px; padding: 0px 0px"),offset = 4,htmlOutput("glsc"))),
-      
-      fluidRow(column(12,div(style = "height: 05px; padding: 0px 0px"))),
-      
-      fluidRow(column(3,htmlOutput("attend"), offset = 4))
-      )
-      )
-     ))))
-      
+ui <- dashboardPage(skin = "blue",
+  dashboardHeader(title = "Uber vs Lyft"),
   
-
+  dashboardSidebar(
     
-  
-  
-  
+    sidebarMenu(id="tabs",
+                sidebarMenuOutput("menu"))),
+  dashboardBody(
+    tags$head(tags$style(HTML('.info-box {min-height: 60px;} .info-box-icon {height: 60px; line-height: 60px;} .info-box-content {padding-top: 0px; padding-bottom: 0px;}'))),
+    #some stats
+    #Average pickup per day in that month info box
+    #Average pickup per week 
+    tabItems(tabItem("dashboard",
+    fluidRow(column(8, offset = 2, box(width = 8, htmlOutput("heading")))),
+    fluidRow(box(width = 4, htmlOutput("average_dailybymonth")), column(3),
+             box(width = 4, selectInput("enter_month", "Select Month:",
+                                                  choices = c("June '16",
+                                                              "July '16",
+                                                              "August '16",
+                                                              "September '16",
+                                                              "October '16",
+                                                              "November '16",
+                                                              "December '16")))),
+    
+    fluidRow(infoBoxOutput("Lyft"),
+                   column(3),infoBoxOutput("Uber")),
+    fluidRow(column(12, div(style = "height:10px; padding: 0px0px", ""))),
+    fluidRow(box(width = 7, htmlOutput(("average_Pickup_monthly")))),
+             fluidRow(infoBoxOutput("Lyft1"),
+                      column(3),infoBoxOutput("Uber1"))),
 
-
+    tabItem("bc",box(width = 3, selectInput("intervaltype","Interval Type:", 
+                                          choices = c("Monthly", 
+                                                      "Weekly",
+                                                      "Daily"))), box(width = 9, 
+                               solidHeader = TRUE, 
+                               plotlyOutput("barplot", height ="400px"))), 
+    tabItem("pc",box(width = 3, selectInput("sp_month","Specify Month:", 
+                                            choices = c("June '16",
+                                                        "July '16",
+                                                        "August '16",
+                                                        "September '16",
+                                                        "October '16",
+                                                        "November '16",
+                                                        "December '16"), selected = "July '16")), box(width = 9, solidHeader = TRUE, plotlyOutput("piechart", height ="400px"))),
+    tabItem("lc", box(width = 3, dateRangeInput("date_s", "Date Range:", start = "2016-06-05", end = "2016-12-31", min = "2016-06-05",
+                                 max = "2016-12-31", format = "yyyy-mm-dd", startview = "2016-06-05")), box(width = 9, solidHeader = TRUE, plotlyOutput("linechart", height ="400px")))
+        )
+    )
+  )
 
 
 server <- function(input, output, session) {
-  
-  #flag-header-one
-  output$preImage <- renderImage({
-    filename <- normalizePath(file.path('www',
-                                        paste('image', input$year, '.jpg', sep='')))
-    
-    list(src = filename,
-         width = 120,
-         height = 140,
-         alt = paste("Image number", input$year))
-   
-    
-  }, deleteFile = FALSE)
-  
-  #mascot
-  output$mascotImage <- renderImage({
-    filename <- normalizePath(file.path('www',
-                                        paste('mascot',input$year, '.png', sep='')))
-    
-    list(src = filename,
-         width = 120,
-         height = 140,
-         alt = paste("Official Mascot","(Note: Mascots were used in FIFA worldcups post 1966)"))
-    
-    
-  }, deleteFile = FALSE)
-  
-  #text-header-one
-  output$text <- renderText({
-    infotext <- fifa_wc[fifa_wc$Year == input$year, 11]
-    infolink <- fifa_wc[fifa_wc$Year == input$year, 12]
-    paste("<p><h5 style = color:#21618C>",infotext,"</h5></p>","<a href =",infolink,">","Read more...","</a>")})
-  #wintrpext
-  output$win <- renderText({ 
-  paste("<h3 style= color:#154360>","Winner","</h3>")})
-  
-  output$rp <- renderText({ 
-  paste("<h3 style= color:#154360>","Runner up","</h3>")})
-  
-  output$th <- renderText({ 
-    paste("<h2 style= color:#154360>"," ","</h2>")})
-  
-  output$fo <- renderText({ 
-    paste("<h2 style= color:#154360>"," ","</h2>")})
-  
-  
-  #image-winner
-  output$imagewinner <- renderImage({
-    filename <- normalizePath(file.path('www',
-                                        paste('imagew', input$year, '.png', sep='')))
-    
-    list(src = filename,
-         width = 175,
-         height = 110,
-         alt = paste("Image number", input$year))
-    
-  }, deleteFile = FALSE)
-  #image-runnerup
-  output$imagerp <- renderImage({
-    filename <- normalizePath(file.path('www',
-                                        paste('imager', input$year, '.png', sep='')))
-    
-    list(src = filename,
-         width = 175,
-         height = 110,
-         alt = paste("Image number", input$year))
-    
-  }, deleteFile = FALSE)
-  #image-text-thirs-fourth
-  output$text1 <- renderText({ 
-    n <-input$year
-    third = fifa_wc[fifa_wc$Year == n, 5]
-    paste("<h4 style= color:#154360>","The team placed third was","<h3 style = color:#145A32>",third,"</h3>","</h4>")}) 
-
-  output$text2 <- renderText({ 
-    n <-input$year
-    fourth = fifa_wc[fifa_wc$Year == n, 6]
-    paste("<h4 style= color:#154360>","The team placed fourth was","<h3 style = color:#145A32>",fourth,"</h3>","</h4>")})
-  
-#text-below
-  #wintrpext
-  output$win1 <- renderText({ 
-    wn = fifa_wc[fifa_wc$Year == input$year,3]
-    paste("<h4 style= color:#145A32 align = center>",wn,"</h4>")})
-  
-  output$rp1 <- renderText({ 
-    rp = fifa_wc[fifa_wc$Year == input$year,4]
-    paste("<h4 style= color:#145A32 align = center>",rp,"</h4>")})
-    
-  output$th1 <- reactive({
-    paste("")
+  output$heading <- renderUI({
+    HTML("<h5><b>The objective is to do a comparative anaalysis of Uber and Lyft pickups at Phoenix Airport. We start with some mean stats to gain a basic idea.</h3>")
   })
-  output$fo1 <- reactive({
-    paste("")
+  #rendering default tab
+  output$menu <- renderMenu({
+    sidebarMenu(
+      menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
+      menuItem("Charts",icon = icon("bar-chart-o"),
+               menuSubItem("Bar Chart viz", tabName = "bc"),
+               menuSubItem("Pie Chart viz", tabName = "pc"),
+               menuSubItem("Line Chart viz", tabName = "lc")
+      )
+    )
+  })
+  isolate({updateTabItems(session, "tabs", "dashboard")})
+  
+  
+  
+    output$average_dailybymonth <- renderUI({
+    HTML(paste("<h4 style = align:center>Average pickup per day for ","<b>",input$enter_month,"</b>"," is:" ))
+  })
+    
+    output$average_Pickup_monthly <- renderUI({
+      HTML(paste("<h5>Average pickup for period of June '16 to December '16 was:"))
+    })
+  
+  #infobox-Uber
+  output$Uber <- renderInfoBox({
+    if (input$enter_month == "July '16" | input$enter_month == "August '16" | input$enter_month == "October '16" | input$enter_month == "December '16")
+    {
+      pubymonth_fc_temp1_Uber = pubymonth_fc[pubymonth$Month == input$enter_month,1]
+      monthly_total = pubymonth_fc[pubymonth_fc$Month == "August '16" & pubymonth_fc$Service_Provider == "Uber",4]
+      average1 = as.integer(monthly_total/31)
+    }
+    else
+    {
+      pubymonth_fc_temp1_Uber = pubymonth_fc[pubymonth$Month == input$enter_month,1]
+      monthly_total = pubymonth_fc[pubymonth_fc$Month == "August '16" & pubymonth_fc$Service_Provider == "Uber",4]
+      average1 = as.integer(monthly_total/30)
+    }
+    infoBox(
+      "Uber Pickups:", paste0(average1), icon = icon("taxi"), color = "green"
+    )
   })
   
-  output$teamspl <- renderText({ QT = fifa_wc[fifa_wc$Year == input$year, 8]
-    paste("<h4 style= color:#145A32 align = 'center'><img src= teamsqicon.png height = 50 width = 50 align = middle><br><b>Teams Qualified:</b>","<br>","<h2 style=color:#17A589 align = center>",QT,"</h3>","</img>","</h4>")})
+  #infobox-Lyft
+  output$Lyft <- renderInfoBox({
+    if (input$enter_month == "July '16" | input$enter_month == "August '16" | input$enter_month == "October '16" | input$enter_month == "December '16")
+    {
+      pubymonth_fc_temp1_Uber = pubymonth_fc[pubymonth$Month == input$enter_month,1]
+      monthly_total = pubymonth_fc[pubymonth_fc$Month == "August '16" & pubymonth_fc$Service_Provider == "Lyft",4]
+      average1 = as.integer(monthly_total/31)
+    }
+    else
+    {
+      pubymonth_fc_temp1_Uber = pubymonth_fc[pubymonth$Month == input$enter_month,1]
+      monthly_total = pubymonth_fc[pubymonth_fc$Month == "August '16" & pubymonth_fc$Service_Provider == "Lyft",4]
+      average1 = as.integer(monthly_total/30)
+    }
+    infoBox(
+      "Lyft Pickups:", paste0(average1), icon = icon("car"), color = "red"
+    )
+  })
   
-  output$matpl <- renderText({ MP = fifa_wc[fifa_wc$Year == input$year, 9]
-    paste("<h4 style= color:#145A32 align = 'center'><img src= matchpicon.png height = 50 width = 50 align = middle><br><b>Total Matches Played:</b>","<br>","<h2 style=color:#17A589 align = center>",MP,"</h2>","</img>","</h4>")})
-   
-  output$glsc <- renderText({ GL = fifa_wc[fifa_wc$Year == input$year, 7]
-    paste("<h4 style= color:#145A32><img src= goalsicon.png height = 50 width = 50><b>Total Goals Scored:</b>","<br>","<h1 style=color:#17A589 align = center>",GL,"</h1>","</h4>")})
   
-  output$attend <- renderText({ AD = fifa_wc[fifa_wc$Year == input$year, 10]
-    paste("<h4 style= color:#145A32><img src= crowdicon.png height = 50 width = 70><b>Attendance:</b>","<br>","<h1 style=color:#17A589 align = center>",AD,"</h1>","</h4>")})
+  output$Uber1 <- renderInfoBox({
+  infoBox(
+    "Average Uber Pickups:",as.integer(mean(pubymonth$Uber)), icon = icon("taxi"), color = "green"
+  )
+})
+  
+  output$Lyft1 <- renderInfoBox({
+    infoBox(
+      "Average Lyft Pickups:",as.integer(mean(pubymonth$Lyft)), icon = icon("car"), color = "red"
+    )
+  })
+  
+  
+  
+  #CHARTS
+  barplottest <- reactive({
+    q <- plot_ly(pubyday, x = ~t_day, y = ~Lyft, type = 'bar', name = "Lyft", marker = list(color = 'rgb(255,69,0)')) %>% add_trace(y = ~Uber, name = "Uber", marker = list(color = 'rgb(50,205,50)'))  %>% layout(xaxis = list(title = '', tickangle = -45), yaxis = list(title = 'Count'), barmode = 'group', rangeslider = list (type = "date"))
+    p <- plot_ly(pubymonth, x = ~Month, y = ~Lyft, type = 'bar', name = "Lyft",marker = list(color = 'rgb(255,69,0)')) %>% add_trace(y = ~Uber, name = "Uber", marker = list(color = 'rgb(50,205,50)'))  %>% layout(xaxis = list(title = '', tickangle = -45), yaxis = list(title = 'Count'), barmode = 'group', rangeslider = list (type = "date"))
+    r <- plot_ly(pubyweek, x = ~week, y = ~Lyft, type = 'bar', name = "Lyft",marker = list(color = 'rgb(255,69,0)')) %>% add_trace(y = ~Uber, name = "Uber", marker = list(color = 'rgb(50,205,50)'))  %>% layout(xaxis = list(title = '', tickangle = -90), yaxis = list(title = 'Count'), barmode = 'group', rangeslider = list (type = "date"))
+    if ( "Monthly" %in% input$intervaltype) return(p)
+    if ( "Daily" %in% input$intervaltype) return(q)
+    if ("Weekly" %in% input$intervaltype) return(r)
+  })
+  output$barplot <- renderPlotly({   
+    dataplots = barplottest()
+    print(dataplots)
+  }) 
+  
+  piepcharttest <- reactive({
+    colors <- c('rgb(255,69,0)', 'rgb(50,205,50)')
+    pubymonth_fc_temp <- pubymonth_fc[pubymonth_fc$Month == input$sp_month,]
+    p_r <- plot_ly(pubymonth_fc_temp, labels = ~Service_Provider, values = ~n, type = 'pie', marker = list(colors = colors)) %>%
+      layout(title = 'Market Share of Uber and Lyft',
+             xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+             yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+    })
+  
+  output$piechart <- renderPlotly({
+  dataplots_1 = piepcharttest()
+  print(dataplots_1)  
+  })
+  
+  linecharttest <- reactive({
+    
+      mindate <- as.Date(input$date_s[1]) 
+      maxdate <- as.Date(input$date_s[2])
+      
+      temp_data = subset(pubyday, as.Date(t_day) > mindate & as.Date(t_day) < maxdate)
+      Day = as.Date(temp_data$t_day)
+      plot_s <- ggplot(temp_data, aes(x = Day)) + geom_line(aes(y = Uber, colour = "Uber")) + geom_line(aes(y = Lyft, colour = "Lyft")) + scale_colour_manual(name=" ", values=c(Uber="green", Lyft="red"))+ scale_x_date(limits = as.Date(c(mindate, maxdate)), date_breaks = "10 days", date_minor_breaks = "1 day", labels=date_format("%d-%m-%Y")) + theme_minimal() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + xlab("Day") + ylab("No. of Customers") + theme(panel.border = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank()) 
+      plot_ <-ggplotly(plot_s)
+      plot_
+      })
+  
+   output$linechart <- renderPlotly({
+     dataplots_2 = linecharttest()
+     print(dataplots_2)
+        })
   
   
 }
 
-shinyApp(ui = ui, server = server)
+shinyApp(ui, server)
+
+# pubymonth_fc_temp <- pubymonth_fc[pubymonth_fc$Month == "August '16",]
+# pubymonth_fc_temp
+# View(pubymonth_fc_temp)
