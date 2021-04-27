@@ -1,5 +1,5 @@
 # R_Shiny_Dashboards
-Dashboards for data visualization created using RShiny package in R.
+#### I have created two dashboards for data visualization using RShiny package in R - Uber vs Lyft Dashboard and FIFA Dashboard. 
 
 ## Uber Vs Lyft Dashboard
 ### Interactive Visualization of Rides of Uber and Lyft from Phoenix Airport. 
