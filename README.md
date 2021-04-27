@@ -7,4 +7,4 @@ Dashboards for data visualization created using RShiny package in R
 
 ## FIFA Dashboard
 ### Interactive Visualization of stats of all the FIFA worldcups. 
-[Here](https://ketanthakare.shinyapps.io/Shiny_UbervsLyft/) is the webapp and you can read more about the development process [here](). 
+[Here](https://ketanthakare.shinyapps.io/Shiny_FIFA/) is the webapp and you can read more about the development process [here](). 
