@@ -6,17 +6,6 @@
 The [webapp](https://ketanthakare.shinyapps.io/Shiny_UbervsLyft/) and you can read more about the development process [here](UberVsLyft_readme.md).  
 
 #### Preview:
-1. Information tab
-<img width="946" alt="screenshot_infopage" src="https://user-images.githubusercontent.com/37136185/43149004-132e044e-8f84-11e8-9357-d31837f20d4c.png">
-
-2. Stats tab
-<img width="960" alt="screenshot_somestats" src="https://user-images.githubusercontent.com/37136185/43149224-9475d220-8f84-11e8-86da-9c6576f9b2e3.png">
-
-## FIFA Dashboard
-### Interactive Visualization of stats of all the FIFA worldcups. 
-The [webapp](https://ketanthakare.shinyapps.io/Shiny_FIFA/) and you can read more about the development process [here](FIFA_readme.md). 
-
-#### Preview:
 
 <img width="960" alt="screenshotdashboard" src="https://user-images.githubusercontent.com/37136185/43912059-ce91a0aa-9c1e-11e8-82bb-7e22b1a3083e.png">
 <br></br>
@@ -26,3 +15,17 @@ The [webapp](https://ketanthakare.shinyapps.io/Shiny_FIFA/) and you can read mor
 <br></br>
 <img width="960" alt="linechart" src="https://user-images.githubusercontent.com/37136185/43912158-1eb8dea4-9c1f-11e8-8f43-3273fa77a02f.png">
 <br></br>
+
+
+## FIFA Dashboard
+### Interactive Visualization of stats of all the FIFA worldcups. 
+The [webapp](https://ketanthakare.shinyapps.io/Shiny_FIFA/) and you can read more about the development process [here](FIFA_readme.md). 
+
+
+
+#### Preview:
+1. Information tab
+<img width="946" alt="screenshot_infopage" src="https://user-images.githubusercontent.com/37136185/43149004-132e044e-8f84-11e8-9357-d31837f20d4c.png">
+
+2. Stats tab
+<img width="960" alt="screenshot_somestats" src="https://user-images.githubusercontent.com/37136185/43149224-9475d220-8f84-11e8-86da-9c6576f9b2e3.png">
